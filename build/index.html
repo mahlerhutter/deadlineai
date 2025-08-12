@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Deadline.AI – Nie wieder eine Frist verpassen</title>
+  <meta name="description" content="Deadline.AI erkennt Fristen aus Verträgen automatisch und trägt sie rechtzeitig in Ihren Kalender ein. DSGVO-konform, in Minuten startklar." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E⏰%3C/text%3E%3C/svg%3E"/>
+  <style>
+    :root {
+      --bg: #0c0f14;
+      --bg-2: #121722;
+      --surface: #161b26;
+      --text: #e8eefb;
+      --muted: #a7b2c6;
+      --brand: #ffd54a; /* Gelb als Frist-/Warnakzent */
+      --brand-2: #7cc4ff; /* Sekundärakzent */
+      --ok: #63d297;
+      --danger: #ff6b6b;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 16px;
+      --radius-sm: 12px;
+      --maxw: 1120px;
+    }
+    @media (prefers-color-scheme: light) {
+      :root { --bg: #f7f9fc; --bg-2: #fff; --surface: #fff; --text: #0b1426; --muted: #52607a; --shadow: 0 10px 30px rgba(16,38,73,.12);}  
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0; font: 16px/1.6 Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji"; color: var(--text); background: radial-gradient(1200px 600px at 70% -10%, rgba(124,196,255,.12), transparent 35%), var(--bg);
+    }
+    a { color: inherit; text-decoration: none; }
+    .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 20px; }
+
+    /* Header */
+    header { position: sticky; top: 0; z-index: 50; backdrop-filter: blur(8px); background: linear-gradient(to bottom, rgba(12,15,20,.85), rgba(12,15,20,.65)); border-bottom: 1px solid rgba(255,255,255,.06); }
+    @media (prefers-color-scheme: light) { header { background: rgba(255,255,255,.85); } }
+    .nav { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; }
+    .brand { display: flex; align-items: center; gap: 12px; font-weight: 700; letter-spacing: .2px; }
+    .logo {
+      width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: conic-gradient(from 180deg at 50% 50%, var(--brand) 0 25%, transparent 25% 100%), radial-gradient(90px 60px at 30% -20%, rgba(255,213,74,.45), transparent 40%), var(--surface); box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), var(--shadow);
+    }
+    .nav a.link { opacity: .9; padding: 8px 10px; border-radius: 10px; }
+    .nav .actions { display: flex; align-items: center; gap: 10px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; padding: 10px 16px; border-radius: 999px; font-weight: 600; border: 1px solid rgba(255,255,255,.12); background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); box-shadow: var(--shadow); transition: transform .06s ease, box-shadow .2s ease, background .2s ease; cursor: pointer; }
+    .btn:hover { transform: translateY(-1px); }
+    .btn.brand { background: linear-gradient(180deg, var(--brand), #ffb300); color: #181300; border: none; }
+
+    /* Hero */
+    .hero { display: grid; grid-template-columns: 1.15fr 1fr; gap: 36px; align-items: center; padding: 64px 0 28px; }
+    .kicker { color: var(--brand); font-weight: 700; letter-spacing: .18em; text-transform: uppercase; font-size: 12px; }
+    h1 { font-size: clamp(30px, 5vw, 54px); line-height: 1.08; margin: 8px 0 14px; }
+    .sub { font-size: clamp(16px, 2.2vw, 20px); color: var(--muted); max-width: 50ch; }
+    .cta-row { display: flex; gap: 12px; align-items: center; margin-top: 22px; flex-wrap: wrap; }
+    .mini { font-size: 13px; color: var(--muted); }
+
+    .panel { background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); border: 1px solid rgba(255,255,255,.08); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); }
+    .mock { border-radius: var(--radius); background: var(--surface); border: 1px solid rgba(255,255,255,.08); padding: 18px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.04); }
+    .flow { display: grid; gap: 14px; }
+    .flow-item { display: grid; grid-template-columns: 44px 1fr; gap: 12px; align-items: start; padding: 10px; border-radius: var(--radius-sm); background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)); border: 1px dashed rgba(255,255,255,.15); }
+    .dot { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle at 30% 25%, rgba(255,213,74,.45), transparent 55%), #0e121a; border: 1px solid rgba(255,255,255,.12); }
+
+    /* Sections */
+    section { padding: 56px 0; }
+    h2 { font-size: clamp(24px, 3.6vw, 36px); margin: 0 0 10px; }
+    .lead { color: var(--muted); max-width: 65ch; }
+
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 24px; }
+    .card { padding: 18px; border-radius: var(--radius); background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); border: 1px solid rgba(255,255,255,.08); box-shadow: var(--shadow); }
+
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 24px; }
+    .step { padding: 18px; border-radius: var(--radius); border: 1px solid rgba(255,255,255,.1); background: linear-gradient(180deg, rgba(124,196,255,.12), rgba(255,255,255,.02)); box-shadow: var(--shadow); }
+
+    .trust { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 24px; }
+    .trust .badge { padding: 16px; border-radius: var(--radius); border: 1px solid rgba(255,255,255,.08); background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); text-align: center; font-weight: 600; }
+
+    .cta { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: stretch; }
+    .form { padding: 18px; border-radius: var(--radius); background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); border: 1px solid rgba(255,255,255,.08); box-shadow: var(--shadow); }
+    .form .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .field { display: grid; gap: 6px; margin-bottom: 12px; }
+    label { font-weight: 600; font-size: 14px; }
+    input, select, textarea { width: 100%; padding: 12px 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,.14); background: #0d1118; color: var(--text); outline: none; }
+    @media (prefers-color-scheme: light) { input, select, textarea { background: #fff; } }
+    input:focus, select:focus, textarea:focus { border-color: var(--brand-2); box-shadow: 0 0 0 3px rgba(124,196,255,.25); }
+    .help { font-size: 12px; color: var(--muted); }
+    .policy { display: flex; gap: 10px; align-items: start; font-size: 13px; color: var(--muted); }
+
+    /* Footer */
+    footer { padding: 36px 0 60px; color: var(--muted); border-top: 1px solid rgba(255,255,255,.07); background: linear-gradient(to top, rgba(255,255,255,.02), transparent); }
+
+    /* Utilities */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .center { text-align: center; }
+    .muted { color: var(--muted); }
+    .tick { display: inline-flex; align-items: center; gap: 8px; }
+    .tick svg { flex: 0 0 auto; }
+
+    /* Responsive */
+    @media (max-width: 980px) {
+      .hero { grid-template-columns: 1fr; }
+      .cards, .steps, .trust, .cta, .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    /* Reveal Animations */
+    .reveal { opacity: 0; transform: translateY(12px); transition: opacity .6s ease, transform .6s ease; }
+    .reveal.show { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap nav">
+      <div class="brand" aria-label="Deadline.AI">
+        <div class="logo" aria-hidden="true">⏰</div>
+        <span>Deadline.AI</span>
+      </div>
+      <nav class="links" aria-label="Hauptnavigation">
+        <a class="link" href="#how">So funktioniert's</a>
+        <a class="link" href="#trust">Sicherheit</a>
+        <a class="link" href="#cta">Pilot starten</a>
+      </nav>
+      <div class="actions">
+        <a class="btn" href="#problem">Warum</a>
+        <a class="btn brand" href="#cta">Pilot kostenlos starten</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero wrap">
+      <div class="reveal">
+        <div class="kicker">Konsequenz statt Chaos</div>
+        <h1>Nie wieder eine Frist verpassen.</h1>
+        <p class="sub">Leiten Sie Ihren Vertrag per E‑Mail weiter – Deadline.AI extrahiert alle Fristen automatisch und trägt sie rechtzeitig in Ihren Kalender ein. <strong>Keine ERP‑Hölle. Keine Schulung.</strong></p>
+        <div class="cta-row">
+          <a class="btn brand" href="#cta">Pilot kostenlos starten</a>
+          <a class="btn" href="#how">So funktioniert’s</a>
+          <span class="mini">EU‑Hosting • DSGVO‑konform • In 5 Minuten startklar</span>
+        </div>
+      </div>
+      <div class="reveal">
+        <div class="panel">
+          <div class="mock">
+            <div style="display:grid;gap:14px">
+              <div class="flow">
+                <div class="flow-item">
+                  <div class="dot" aria-hidden="true">📩</div>
+                  <div>
+                    <strong>Mail‑in</strong>
+                    <div class="muted">Senden Sie <em>vertrag.pdf</em> an <code>kunde123@deadline.ai</code></div>
+                  </div>
+                </div>
+                <div class="flow-item">
+                  <div class="dot" aria-hidden="true">🤖</div>
+                  <div>
+                    <strong>KI‑Extraktion</strong>
+                    <div class="muted">Kündigung 3 Monate vor Vertragsende • Gewährleistung 24 Monate ab Abnahme</div>
+                  </div>
+                </div>
+                <div class="flow-item">
+                  <div class="dot" aria-hidden="true">📅</div>
+                  <div>
+                    <strong>Kalender‑Reminder</strong>
+                    <div class="muted">Einträge mit 90/30/7/1‑Tage Vorwarnung</div>
+                  </div>
+                </div>
+              </div>
+              <div class="panel" style="display:grid;gap:8px">
+                <div class="tick"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 7L9 18l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Kein Fristen‑Excel mehr</div>
+                <div class="tick"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 7L9 18l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Review‑Stufe vor Eintrag</div>
+                <div class="tick"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 7L9 18l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>EU‑Hosting, DSGVO‑konform</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Problem -->
+    <section id="problem">
+      <div class="wrap">
+        <h2 class="reveal">Verpasste Fristen kosten Millionen – Excel schützt Sie nicht.</h2>
+        <p class="lead reveal">Kündigungsfenster, Claim‑Deadlines, Gewährleistungsenden: verstreut in Mails, PDFs, Ordnern. Deadline.AI macht aus Text <em>verlässliche Termine</em> – ohne manuelles Tippen.</p>
+        <div class="cards">
+          <div class="card reveal"><strong>Teure Verluste</strong><br><span class="muted">Verpasste Fristen führen zu automatischen Verlängerungen, entgangenen Ansprüchen und Streit.</span></div>
+          <div class="card reveal"><strong>Aufwand & Fehler</strong><br><span class="muted">Fristenlisten per Hand sind fehleranfällig und hängen an Einzelpersonen.</span></div>
+          <div class="card reveal"><strong>Kein Überblick</strong><br><span class="muted">Wer erinnert wann? In welchem Kalender? Deadline.AI zentralisiert.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How it works -->
+    <section id="how">
+      <div class="wrap">
+        <h2 class="reveal">So funktioniert’s</h2>
+        <p class="lead reveal">Drei Schritte. Fünf Minuten. Sofort Wert.</p>
+        <div class="steps">
+          <div class="step reveal"><strong>1) Weiterleiten</strong><br><span class="muted">Vertrag/AGB als E‑Mail‑Anhang an Ihre persönliche Deadline.AI‑Adresse senden.</span></div>
+          <div class="step reveal"><strong>2) Prüfen</strong><br><span class="muted">KI‑Vorschau der erkannten Fristen bestätigen oder anpassen.</span></div>
+          <div class="step reveal"><strong>3) Erinnern</strong><br><span class="muted">Automatische Kalendereinträge mit Vorwarnung 90/30/7/1 Tage.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Trust & Security -->
+    <section id="trust">
+      <div class="wrap">
+        <h2 class="reveal">Sicherheit & Vertrauen</h2>
+        <p class="lead reveal">DSGVO‑konform. EU‑Hosting. Sie behalten Kontrolle.</p>
+        <div class="trust">
+          <div class="badge reveal">EU‑Hosting (Frankfurt)</div>
+          <div class="badge reveal">Verschlüsselung (AES‑256)</div>
+          <div class="badge reveal">DPA & Audit‑Trail</div>
+          <div class="badge reveal">Kein ERP nötig</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA / Form -->
+    <section id="cta">
+      <div class="wrap">
+        <div class="grid-2">
+          <div class="reveal">
+            <h2>Testen Sie Deadline.AI in Ihrem Unternehmen</h2>
+            <p class="lead">3 Monate kostenfrei, bis zu 10 Verträge. Kein Risiko, kein Setup‑Aufwand. Wir messen gemeinsam, was Sie sparen.</p>
+            <ul>
+              <li class="tick"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 7L9 18l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Mail‑in → Kalender in Minuten</li>
+              <li class="tick"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 7L9 18l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Review‑Stufe für 100% Kontrolle</li>
+              <li class="tick"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 7L9 18l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Slack/Teams/WhatsApp optional</li>
+            </ul>
+          </div>
+          <form class="form reveal" id="pilot-form" novalidate>
+            <div class="row">
+              <div class="field"><label for="name">Name</label><input id="name" name="name" autocomplete="name" required placeholder="Max Mustermann"/></div>
+              <div class="field"><label for="company">Unternehmen</label><input id="company" name="company" autocomplete="organization" required placeholder="Acme GmbH"/></div>
+            </div>
+            <div class="row">
+              <div class="field"><label for="email">E‑Mail</label><input id="email" name="email" type="email" autocomplete="email" required placeholder="max@acme.com"/></div>
+              <div class="field"><label for="volume">Verträge/Jahr</label>
+                <select id="volume" name="volume" required>
+                  <option value="" disabled selected>Bitte wählen…</option>
+                  <option>&lt; 50</option>
+                  <option>50–200</option>
+                  <option>200–1000</option>
+                  <option>&gt; 1000</option>
+                </select>
+              </div>
+            </div>
+            <div class="field"><label for="message">Optional: Kommentar</label><textarea id="message" name="message" rows="3" placeholder="Welche Verträge/Fristen sind bei Ihnen kritisch?…"></textarea></div>
+            <div class="policy"><input id="consent" type="checkbox" required aria-required="true"/> <label for="consent">Ich stimme zu, dass meine Angaben zur Kontaktaufnahme verarbeitet werden. <span class="help">(DSGVO‑konform, kein Spam)</span></label></div>
+            <div style="display:flex; gap:10px; align-items:center; margin-top:8px">
+              <button class="btn brand" type="submit">Pilot anfragen</button>
+              <span class="help" id="form-help">Antwort in 24h (Werktage)</span>
+            </div>
+            <p class="help" style="margin-top:10px">Oder schreiben Sie direkt an <a href="mailto:pilot@deadline.ai">pilot@deadline.ai</a></p>
+            <div id="toast" role="status" aria-live="polite" style="display:none; margin-top:12px; padding:10px 12px; border-radius:10px; background:rgba(99,210,151,.12); border:1px solid rgba(99,210,151,.45); color:var(--text)">Danke! Wir melden uns kurzfristig für die Demo.</div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <div class="grid-2">
+        <div>
+          <div class="brand"><div class="logo" aria-hidden="true">⏰</div><span>Deadline.AI</span></div>
+          <p class="muted">Automatisierte Fristen aus Verträgen. Erinnerungen rechtzeitig in Ihrem Kalender. EU‑Hosting. DSGVO‑konform.</p>
+        </div>
+        <div>
+          <div class="muted">Rechtliches & Kontakt</div>
+          <ul style="list-style:none; padding:0; margin:8px 0 0; display:grid; gap:6px">
+            <li><a class="link" href="#">Impressum</a></li>
+            <li><a class="link" href="#">Datenschutz</a></li>
+            <li><a class="link" href="mailto:hello@deadline.ai">hello@deadline.ai</a></li>
+          </ul>
+        </div>
+      </div>
+      <p class="center muted" style="margin-top:28px">© <span id="year"></span> Deadline.AI</p>
+    </div>
+  </footer>
+
+  <script>
+    // Smooth scroll for internal links
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        const id = a.getAttribute('href');
+        if (id.length > 1) {
+          e.preventDefault();
+          document.querySelector(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    // Reveal on view
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('show'); });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+    // Form handling (client-side demo)
+    const form = document.getElementById('pilot-form');
+    const toast = document.getElementById('toast');
+    form?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+      const data = Object.fromEntries(new FormData(form));
+      // Simulate POST
+      toast.style.display = 'block';
+      toast.textContent = 'Danke, ' + (data.name || '');
+      form.reset();
+    });
+
+    // Footer year
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
